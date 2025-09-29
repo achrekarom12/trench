@@ -9,10 +9,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"npm run -w @trench/api dev\"",
+    "dev": "concurrently \"npm run -w @trench/api dev\" \"npm run -w @trench/trench dev\"",
     "dev:backend": "npm run -w @trench/api dev",
-    "start": "concurrently \"npm run -w @trench/api start\"",
+    "dev:frontend": "npm run -w @trench/trench dev",
+    "start": "concurrently \"npm run -w @trench/api start\" \"npm run -w @trench/trench start\"",
     "start:backend": "npm run -w @trench/api start",
+    "start:frontend": "npm run -w @trench/trench start",
     "build": "npm -ws run build --if-present",
     "test": "npm -ws run test --if-present"
   },
