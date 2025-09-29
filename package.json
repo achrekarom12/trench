@@ -1,0 +1,33 @@
+{
+  "name": "trench",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/api",
+    "apps/trench"
+  ],
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run -w @trench/api dev\"",
+    "dev:backend": "npm run -w @trench/api dev",
+    "start": "concurrently \"npm run -w @trench/api start\"",
+    "start:backend": "npm run -w @trench/api start",
+    "build": "npm -ws run build --if-present",
+    "test": "npm -ws run test --if-present"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://achrekarom12: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@github.com/achrekarom12/trench.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/achrekarom12/trench/issues"
+  },
+  "homepage": "https://github.com/achrekarom12/trench#readme",
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
