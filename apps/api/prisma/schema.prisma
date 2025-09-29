@@ -16,9 +16,9 @@ datasource db {
 
 // Enums
 enum UserRole {
-  USER
+  STUDENT
+  FACULTY
   ADMIN
-  MODERATOR
 }
 
 enum UserStatus {
@@ -50,7 +50,7 @@ model User {
   email     String     @unique
   name      String
   password  String
-  role      UserRole   @default(USER)
+  role      UserRole   @default(STUDENT)
   status    UserStatus @default(ACTIVE)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -64,6 +64,9 @@ model User {
   userProfiles        UserProfile[]
   emailVerifications  EmailVerification[]
   notifications       Notification[]
+  student             Student?
+  faculty             Faculty?
+  admin               Admin?
 
   // Indexes
   @@index([email])
@@ -217,4 +220,62 @@ model SystemSetting {
   @@index([key])
   @@index([category])
   @@map("system_settings")
+}
+
+// Student Model
+model Student {
+  id           String  @id
+  rollNumber    String  @unique @map("roll_number")
+  department    String
+  year          Int
+  division      String?
+  academicYear  String? @map("academic_year")
+  prn           String? @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([rollNumber])
+  @@index([department])
+  @@index([year])
+  @@index([prn])
+  @@map("students")
+}
+
+// Faculty Model
+model Faculty {
+  id             String  @id
+  employeeId     String  @unique @map("employee_id")
+  department     String
+  designation    String?
+  specialization String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([employeeId])
+  @@index([department])
+  @@index([designation])
+  @@map("faculty")
+}
+
+// Admin Model
+model Admin {
+  id         String   @id
+  department String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([department])
+  @@map("admins")
 }

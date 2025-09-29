@@ -29,6 +29,11 @@ export class EmailService {
 export class AuthService {
   constructor(private fastify: FastifyInstance) { }
 
+  // Helper method to hash passwords
+  private async hashPassword(password: string): Promise<string> {
+    return await bcrypt.hash(password, 10)
+  }
+
   async createUser(input: CreateUserInput): Promise<Omit<User, 'password'>> {
     const isEmailAvailable = await databaseService.isEmailAvailable(input.email)
 
@@ -48,6 +53,7 @@ export class AuthService {
       email: input.email,
       name: input.name,
       password: hashedPassword,
+      role: input.role,
     })
 
     this.fastify.log.info({ msg: `✅ User ${user.email} created successfully` })
@@ -154,6 +160,7 @@ export class AuthService {
       id: user.id,
       email: user.email,
       name: user.name,
+      role: user.role,
       createdAt: user.createdAt,
       isDeleted: user.isDeleted,
       deletedAt: user.deletedAt || undefined
@@ -291,5 +298,97 @@ export class AuthService {
 </html>
 `
     await emailService.sendEmail(email, 'Welcome to Trench!', body)
+  }
+
+  // Role-specific registration methods
+  async createStudent(studentData: {
+    email: string
+    name: string
+    password: string
+    rollNumber: string
+    department: string
+    year: number
+    division?: string
+    academicYear?: string
+    prn?: string
+  }) {
+    try {
+      // Check if roll number already exists
+      const rollNumberExists = await databaseService.checkRollNumberExists(studentData.rollNumber)
+      if (rollNumberExists) {
+        throw new Error('Roll number already exists')
+      }
+
+      // Check if PRN already exists (if provided)
+      if (studentData.prn) {
+        const prnExists = await databaseService.checkPrnExists(studentData.prn)
+        if (prnExists) {
+          throw new Error('PRN already exists')
+        }
+      }
+
+      const hashedPassword = await this.hashPassword(studentData.password)
+      const result = await databaseService.createStudent({
+        ...studentData,
+        password: hashedPassword
+      })
+
+      this.fastify.log.info({ msg: `✅ Student created successfully: ${studentData.email}` })
+      return result
+    } catch (error: any) {
+      this.fastify.log.error({ msg: `❌ Error creating student: ${error.message}`, error })
+      throw error
+    }
+  }
+
+  async createFaculty(facultyData: {
+    email: string
+    name: string
+    password: string
+    employeeId: string
+    department: string
+    designation?: string
+    specialization?: string
+  }) {
+    try {
+      // Check if employee ID already exists
+      const employeeIdExists = await databaseService.checkEmployeeIdExists(facultyData.employeeId)
+      if (employeeIdExists) {
+        throw new Error('Employee ID already exists')
+      }
+
+      const hashedPassword = await this.hashPassword(facultyData.password)
+      const result = await databaseService.createFaculty({
+        ...facultyData,
+        password: hashedPassword
+      })
+
+      this.fastify.log.info({ msg: `✅ Faculty member created successfully: ${facultyData.email}` })
+      return result
+    } catch (error: any) {
+      this.fastify.log.error({ msg: `❌ Error creating faculty member: ${error.message}`, error })
+      throw error
+    }
+  }
+
+  async createAdmin(adminData: {
+    email: string
+    name: string
+    password: string
+    department?: string
+  }) {
+    try {
+      const hashedPassword = await this.hashPassword(adminData.password)
+      const result = await databaseService.createAdmin({
+        ...adminData,
+        password: hashedPassword
+      })
+
+      this.fastify.log.info({ msg: `✅ Admin created successfully: ${adminData.email}` })
+      return result
+    } catch (error: any) {
+      this.fastify.log.error({ msg: `❌ Error creating admin: ${error.message}`, error })
+      throw error
+    }
   }
 }

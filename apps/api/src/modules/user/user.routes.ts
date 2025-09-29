@@ -32,6 +32,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
                 id: { type: 'string' },
                 email: { type: 'string' },
                 name: { type: 'string' },
+                role: { type: 'string', enum: ['STUDENT', 'FACULTY', 'ADMIN'] },
                 createdAt: { type: 'string' },
                 isDeleted: { type: 'boolean' },
                 deletedAt: { type: 'string', nullable: true }
@@ -92,6 +93,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
                 id: { type: 'string' },
                 email: { type: 'string' },
                 name: { type: 'string' },
+                role: { type: 'string', enum: ['STUDENT', 'FACULTY', 'ADMIN'] },
                 createdAt: { type: 'string' },
                 isDeleted: { type: 'boolean' },
                 deletedAt: { type: 'string', nullable: true }

@@ -2,6 +2,7 @@ export interface CreateUserInput {
   email: string
   password: string
   name: string
+  role?: 'STUDENT' | 'FACULTY' | 'ADMIN'
 }
 
 export interface LoginInput {
@@ -24,6 +25,7 @@ export interface User {
   email: string
   name: string
   password: string
+  role: 'STUDENT' | 'FACULTY' | 'ADMIN'
   createdAt: Date
   isDeleted: boolean
   deletedAt?: Date

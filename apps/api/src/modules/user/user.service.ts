@@ -18,6 +18,7 @@ export class UserService {
       id: user.id,
       email: user.email,
       name: user.name,
+      role: user.role,
       createdAt: user.createdAt,
       isDeleted: user.isDeleted,
       deletedAt: user.deletedAt || undefined
@@ -49,6 +50,7 @@ export class UserService {
       id: updatedUser.id,
       email: updatedUser.email,
       name: updatedUser.name,
+      role: updatedUser.role,
       createdAt: updatedUser.createdAt,
       isDeleted: updatedUser.isDeleted,
       deletedAt: updatedUser.deletedAt || undefined
