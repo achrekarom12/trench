@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3030";
 
 class ApiClient {
   private baseURL: string;
@@ -31,8 +31,15 @@ class ApiClient {
   }
 
   // Auth endpoints
+  async signup(name: string, email: string, password: string, role: string = "STUDENT") {
+    return this.request("/api/v1/auth/signup", {
+      method: "POST",
+      body: JSON.stringify({ name, email, password, role }),
+    });
+  }
+
   async login(email: string, password: string) {
-    return this.request("/auth/login", {
+    return this.request("/api/v1/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });

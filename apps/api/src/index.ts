@@ -18,7 +18,7 @@ export async function buildServer(): Promise<FastifyInstance> {
   
   // Register CORS plugin first
   await app.register(cors, {
-    origin: ['http://localhost:3031', 'http://127.0.0.1:3031'],
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:3031', 'http://127.0.0.1:3031'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -30,19 +30,10 @@ export async function buildServer(): Promise<FastifyInstance> {
   await app.register(jwtPlugin)
   await app.register(rbacPlugin)
   
-  // Register auth routes
   await app.register(authRoutes, { prefix: '/api/v1/auth' })
-  
-  // Register user routes
   await app.register(userRoutes, { prefix: '/api/v1/user' })
-  
-  // Register student routes
   await app.register(studentRoutes, { prefix: '/api/v1/students' })
-  
-  // Register faculty routes
   await app.register(facultyRoutes, { prefix: '/api/v1/faculty' })
-  
-  // Register admin routes
   await app.register(adminRoutes, { prefix: '/api/v1/admins' })
   
   return app
