@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 
 export default function Layout({
@@ -9,28 +10,14 @@ export default function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const [userType, setUserType] = useState<"student" | "faculty" | "admin">("student");
-  const [loading, setLoading] = useState(true);
+  const { user, loading, isAuthenticated } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is logged in
-    const user = localStorage.getItem("user");
-    if (!user) {
+    if (!loading && !isAuthenticated) {
       router.push("/login");
-      return;
     }
-
-    try {
-      const userData = JSON.parse(user);
-      setUserType(userData.role);
-    } catch (error) {
-      console.error("Error parsing user data:", error);
-      router.push("/login");
-    } finally {
-      setLoading(false);
-    }
-  }, [router]);
+  }, [loading, isAuthenticated, router]);
 
   if (loading) {
     return (
@@ -39,9 +26,13 @@ export default function Layout({
       </div>
     );
   }
+
+  if (!isAuthenticated || !user) {
+    return null;
+  }
   
   return (
-    <DashboardLayout userType={userType}>
+    <DashboardLayout userType={user.role.toLowerCase() as "student" | "faculty" | "admin"}>
       {children}
     </DashboardLayout>
   );

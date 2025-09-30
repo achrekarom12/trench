@@ -2,49 +2,39 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiClient } from "@/lib/api";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
     
-    // Dummy credentials for testing
-    const dummyCredentials = [
-      { email: "student@trench.com", password: "password", role: "student" },
-      { email: "faculty@trench.com", password: "password", role: "faculty" },
-      { email: "admin@trench.com", password: "password", role: "admin" },
-      { email: "test@test.com", password: "test", role: "student" }
-    ];
-    
-    const validCredential = dummyCredentials.find(
-      cred => cred.email === email && cred.password === password
-    );
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const response = await apiClient.login(email, password, rememberMe) as any;
       
-      if (validCredential) {
-        // Store user info in localStorage for demo
-        localStorage.setItem("user", JSON.stringify({
-          email: validCredential.email,
-          role: validCredential.role,
-          name: validCredential.role === "student" ? "John Student" : 
-                validCredential.role === "faculty" ? "Dr. Jane Faculty" : 
-                "Admin User"
-        }));
+      if (response.success) {
+        // Store user info and token in localStorage
+        localStorage.setItem("user", JSON.stringify(response.user));
+        localStorage.setItem("token", response.token);
         
         // Redirect to dashboard
         router.push("/dashboard");
       } else {
-        alert("Invalid credentials. Try:\n- student@trench.com / password\n- faculty@trench.com / password\n- admin@trench.com / password\n- test@test.com / test");
+        setError(response.error || "Login failed");
       }
-    }, 1000);
+    } catch (err: any) {
+      setError(err.message || "Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -55,7 +45,7 @@ export default function LoginPage() {
           Trench
         </h1>
         <p className="text-slate-600">
-          Welcome back to your educational platform
+          The Jira for <i>Academia.</i>
         </p>
       </div>
 
@@ -97,6 +87,8 @@ export default function LoginPage() {
               <input
                 id="remember-me"
                 type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-700">
@@ -107,6 +99,13 @@ export default function LoginPage() {
               Forgot password?
             </a>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          )}
 
           <button
             type="submit"

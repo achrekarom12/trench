@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -11,21 +12,16 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children, userType }: DashboardLayoutProps) {
   const [userName, setUserName] = useState("User");
   const router = useRouter();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
-    const user = localStorage.getItem("user");
     if (user) {
-      try {
-        const userData = JSON.parse(user);
-        setUserName(userData.name || "User");
-      } catch (error) {
-        console.error("Error parsing user data:", error);
-      }
+      setUserName(user.name || "User");
     }
-  }, []);
+  }, [user]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
+  const handleLogout = async () => {
+    await logout();
     router.push("/login");
   };
   return (

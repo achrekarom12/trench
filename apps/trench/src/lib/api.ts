@@ -13,9 +13,14 @@ class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     
+    // Get token from localStorage for authenticated requests
+    const token = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
+    
     const config: RequestInit = {
       headers: {
-        "Content-Type": "application/json",
+        // Only set Content-Type if not explicitly overridden and if there's a body
+        ...(options.body && !(options.headers as Record<string, string>)?.["Content-Type"] && { "Content-Type": "application/json" }),
+        ...(token && { "Authorization": `Bearer ${token}` }),
         ...options.headers,
       },
       ...options,
@@ -24,7 +29,8 @@ class ApiClient {
     const response = await fetch(url, config);
     
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `API Error: ${response.status} ${response.statusText}`);
     }
 
     return response.json();
@@ -38,22 +44,22 @@ class ApiClient {
     });
   }
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string, rememberMe: boolean = false) {
     return this.request("/api/v1/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, rememberMe }),
     });
   }
 
   async logout() {
-    return this.request("/auth/logout", {
+    return this.request("/api/v1/auth/logout", {
       method: "POST",
     });
   }
 
   // User endpoints
   async getCurrentUser() {
-    return this.request("/auth/me");
+    return this.request("/api/v1/auth/me");
   }
 
   // Course endpoints
