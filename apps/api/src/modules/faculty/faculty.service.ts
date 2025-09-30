@@ -9,7 +9,7 @@ export class FacultyService {
     name: string
     password: string
     employeeId: string
-    department: string
+    departmentId: string
     designation?: string
     specialization?: string
   }) {
@@ -61,7 +61,7 @@ export class FacultyService {
 
   async updateFaculty(id: string, updateData: {
     employeeId?: string
-    department?: string
+    departmentId?: string
     designation?: string
     specialization?: string
   }) {

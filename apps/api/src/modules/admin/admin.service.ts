@@ -8,7 +8,7 @@ export class AdminService {
     email: string
     name: string
     password: string
-    department?: string
+    departmentId: string
   }) {
     try {
       const result = await databaseService.createAdmin(adminData)
@@ -51,7 +51,7 @@ export class AdminService {
   }
 
   async updateAdmin(id: string, updateData: {
-    department?: string
+    departmentId?: string
   }) {
     try {
       // Check if admin exists

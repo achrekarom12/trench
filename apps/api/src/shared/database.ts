@@ -299,7 +299,7 @@ export class DatabaseService {
     name: string
     password: string
     rollNumber: string
-    department: string
+    departmentId: string
     year: number
     division?: string
     academicYear?: string
@@ -323,7 +323,7 @@ export class DatabaseService {
         data: {
           id: user.id,
           rollNumber: studentData.rollNumber,
-          department: studentData.department,
+          departmentId: studentData.departmentId,
           year: studentData.year,
           division: studentData.division,
           academicYear: studentData.academicYear,
@@ -360,7 +360,7 @@ export class DatabaseService {
     name: string
     password: string
     employeeId: string
-    department: string
+    departmentId: string
     designation?: string
     specialization?: string
   }) {
@@ -382,7 +382,7 @@ export class DatabaseService {
         data: {
           id: user.id,
           employeeId: facultyData.employeeId,
-          department: facultyData.department,
+          departmentId: facultyData.departmentId,
           designation: facultyData.designation,
           specialization: facultyData.specialization
         }
@@ -416,7 +416,7 @@ export class DatabaseService {
     email: string
     name: string
     password: string
-    department?: string
+    departmentId: string
   }) {
     return this.prisma.$transaction(async (tx) => {
       // Create user first
@@ -435,7 +435,7 @@ export class DatabaseService {
       const admin = await tx.admin.create({
         data: {
           id: user.id,
-          department: adminData.department
+          departmentId: adminData.departmentId
         }
       })
 
@@ -618,7 +618,7 @@ export class DatabaseService {
   // Update student
   async updateStudent(id: string, data: {
     rollNumber?: string
-    department?: string
+    departmentId?: string
     year?: number
     division?: string
     academicYear?: string
@@ -646,7 +646,7 @@ export class DatabaseService {
   // Update faculty
   async updateFaculty(id: string, data: {
     employeeId?: string
-    department?: string
+    departmentId?: string
     designation?: string
     specialization?: string
   }) {
@@ -671,7 +671,7 @@ export class DatabaseService {
 
   // Update admin
   async updateAdmin(id: string, data: {
-    department?: string
+    departmentId?: string
   }) {
     return this.prisma.admin.update({
       where: { id },
@@ -689,6 +689,274 @@ export class DatabaseService {
           }
         }
       }
+    })
+  }
+
+  // College operations
+  async createCollege(collegeData: {
+    name: string
+    address?: string
+    phone?: string
+    email?: string
+    website?: string
+  }) {
+    return this.prisma.college.create({
+      data: collegeData
+    })
+  }
+
+  async getAllColleges(paginationParams: PaginationParams = {}): Promise<PaginatedResult<any>> {
+    const { page, limit, skip } = this.getPaginationParams(paginationParams)
+    
+    const [colleges, total] = await Promise.all([
+      this.prisma.college.findMany({
+        skip,
+        take: limit,
+        include: {
+          departments: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      }),
+      this.prisma.college.count()
+    ])
+
+    const totalPages = Math.ceil(total / limit)
+
+    return {
+      data: colleges,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
+    }
+  }
+
+  async getCollegeById(id: string) {
+    return this.prisma.college.findUnique({
+      where: { id },
+      include: {
+        departments: {
+          include: {
+            admins: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    email: true,
+                    name: true
+                  }
+                }
+              }
+            },
+            faculty: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    email: true,
+                    name: true
+                  }
+                }
+              }
+            },
+            students: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    email: true,
+                    name: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+  }
+
+  async updateCollege(id: string, data: {
+    name?: string
+    address?: string
+    phone?: string
+    email?: string
+    website?: string
+  }) {
+    return this.prisma.college.update({
+      where: { id },
+      data
+    })
+  }
+
+  async deleteCollege(id: string) {
+    return this.prisma.college.delete({
+      where: { id }
+    })
+  }
+
+  // Department operations
+  async createDepartment(departmentData: {
+    name: string
+    collegeId: string
+  }) {
+    return this.prisma.department.create({
+      data: departmentData,
+      include: {
+        college: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
+      }
+    })
+  }
+
+  async getAllDepartments(paginationParams: PaginationParams = {}): Promise<PaginatedResult<any>> {
+    const { page, limit, skip } = this.getPaginationParams(paginationParams)
+    
+    const [departments, total] = await Promise.all([
+      this.prisma.department.findMany({
+        skip,
+        take: limit,
+        include: {
+          college: {
+            select: {
+              id: true,
+              name: true
+            }
+          },
+          admins: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  email: true,
+                  name: true
+                }
+              }
+            }
+          },
+          faculty: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  email: true,
+                  name: true
+                }
+              }
+            }
+          },
+          students: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  email: true,
+                  name: true
+                }
+              }
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      }),
+      this.prisma.department.count()
+    ])
+
+    const totalPages = Math.ceil(total / limit)
+
+    return {
+      data: departments,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
+    }
+  }
+
+  async getDepartmentById(id: string) {
+    return this.prisma.department.findUnique({
+      where: { id },
+      include: {
+        college: true,
+        admins: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                name: true
+              }
+            }
+          }
+        },
+        faculty: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                name: true
+              }
+            }
+          }
+        },
+        students: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                name: true
+              }
+            }
+          }
+        }
+      }
+    })
+  }
+
+  async updateDepartment(id: string, data: {
+    name?: string
+    collegeId?: string
+  }) {
+    return this.prisma.department.update({
+      where: { id },
+      data,
+      include: {
+        college: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
+      }
+    })
+  }
+
+  async deleteDepartment(id: string) {
+    return this.prisma.department.delete({
+      where: { id }
     })
   }
 

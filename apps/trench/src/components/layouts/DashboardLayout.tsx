@@ -50,33 +50,15 @@ export default function DashboardLayout({ children, userType }: DashboardLayoutP
               {userType === "student" && (
                 <>
                   <a
-                    href="/courses"
+                    href="/projects"
                     className="flex items-center px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100"
                   >
-                    My Courses
-                  </a>
-                  <a
-                    href="/assignments"
-                    className="flex items-center px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100"
-                  >
-                    Assignments
-                  </a>
-                  <a
-                    href="/grades"
-                    className="flex items-center px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100"
-                  >
-                    Grades
+                    Projects
                   </a>
                 </>
               )}
               {userType === "faculty" && (
                 <>
-                  <a
-                    href="/courses"
-                    className="flex items-center px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100"
-                  >
-                    My Courses
-                  </a>
                   <a
                     href="/students"
                     className="flex items-center px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100"
@@ -84,32 +66,26 @@ export default function DashboardLayout({ children, userType }: DashboardLayoutP
                     Students
                   </a>
                   <a
-                    href="/assignments"
+                    href="/projects"
                     className="flex items-center px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100"
                   >
-                    Assignments
+                    Projects
                   </a>
                 </>
               )}
               {userType === "admin" && (
                 <>
                   <a
-                    href="/users"
+                    href="/admin/faculties"
                     className="flex items-center px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100"
                   >
-                    Users
+                    Faculties
                   </a>
                   <a
-                    href="/courses"
+                    href="/admin/students"
                     className="flex items-center px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100"
                   >
-                    Courses
-                  </a>
-                  <a
-                    href="/analytics"
-                    className="flex items-center px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100"
-                  >
-                    Analytics
+                    Students
                   </a>
                 </>
               )}

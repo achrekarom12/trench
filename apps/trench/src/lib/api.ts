@@ -67,7 +67,7 @@ class ApiClient {
     return this.request(`/assignments/${id}`);
   }
 
-  async submitAssignment(assignmentId: string, submission: any) {
+  async submitAssignment(assignmentId: string, submission: Record<string, unknown>) {
     return this.request(`/assignments/${assignmentId}/submit`, {
       method: "POST",
       body: JSON.stringify(submission),

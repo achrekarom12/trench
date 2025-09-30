@@ -46,7 +46,7 @@ export function useCourses() {
             completedLessons: 14
           }
         ]);
-      } catch (err) {
+      } catch {
         setError("Failed to fetch courses");
       } finally {
         setLoading(false);

@@ -9,7 +9,7 @@ export class StudentService {
     name: string
     password: string
     rollNumber: string
-    department: string
+    departmentId: string
     year: number
     division?: string
     academicYear?: string
@@ -71,7 +71,7 @@ export class StudentService {
 
   async updateStudent(id: string, updateData: {
     rollNumber?: string
-    department?: string
+    departmentId?: string
     year?: number
     division?: string
     academicYear?: string

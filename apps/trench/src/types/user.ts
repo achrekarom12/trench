@@ -1,3 +1,23 @@
+export interface College {
+  id: string;
+  name: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+  collegeId: string;
+  college?: College;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -11,21 +31,27 @@ export interface User {
 
 export interface Student extends User {
   role: "student";
-  studentId: string;
+  rollNumber: string;
+  departmentId: string;
+  department?: Department;
   year: number;
-  major: string;
-  gpa?: number;
+  division?: string;
+  academicYear?: string;
+  prn?: string;
 }
 
 export interface Faculty extends User {
   role: "faculty";
-  facultyId: string;
-  department: string;
-  title: string;
-  office: string;
+  employeeId: string;
+  departmentId: string;
+  department?: Department;
+  designation?: string;
+  specialization?: string;
 }
 
 export interface Admin extends User {
   role: "admin";
+  departmentId: string;
+  department?: Department;
   permissions: string[];
 }
