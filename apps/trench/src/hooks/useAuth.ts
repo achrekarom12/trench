@@ -16,6 +16,7 @@ export function useAuth() {
     if (storedUser && token) {
       try {
         const userData = JSON.parse(storedUser);
+        console.log("User data:", userData);
         setUser(userData);
       } catch (error) {
         console.error("Error parsing stored user:", error);
@@ -29,7 +30,7 @@ export function useAuth() {
 
   const login = async (email: string, password: string, rememberMe: boolean = false) => {
     try {
-      const response = await apiClient.login(email, password, rememberMe);
+      const response = await apiClient.login(email, password, rememberMe) as any;
       
       if (response.success) {
         localStorage.setItem("user", JSON.stringify(response.user));

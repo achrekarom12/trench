@@ -72,16 +72,10 @@ export default function DashboardLayout({ children, userType }: DashboardLayoutP
               {userType === "admin" && (
                 <>
                   <a
-                    href="/admin/faculties"
+                    href="/dashboard"
                     className="flex items-center px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100"
                   >
-                    Faculties
-                  </a>
-                  <a
-                    href="/admin/students"
-                    className="flex items-center px-3 py-2 text-sm font-medium text-slate-700 rounded-lg hover:bg-slate-100"
-                  >
-                    Students
+                    Dashboard
                   </a>
                 </>
               )}

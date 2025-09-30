@@ -21,16 +21,15 @@ export interface Department {
 export interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  role: "student" | "faculty" | "admin";
+  name: string;
+  role: "STUDENT" | "FACULTY" | "ADMIN";
   avatar?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface Student extends User {
-  role: "student";
+  role: "STUDENT";
   rollNumber: string;
   departmentId: string;
   department?: Department;
@@ -41,7 +40,7 @@ export interface Student extends User {
 }
 
 export interface Faculty extends User {
-  role: "faculty";
+  role: "FACULTY";
   employeeId: string;
   departmentId: string;
   department?: Department;
@@ -50,7 +49,7 @@ export interface Faculty extends User {
 }
 
 export interface Admin extends User {
-  role: "admin";
+  role: "ADMIN";
   departmentId: string;
   department?: Department;
   permissions: string[];
