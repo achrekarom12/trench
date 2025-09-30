@@ -88,4 +88,16 @@ export class AdminService {
       throw error
     }
   }
+
+  async getDashboardStats() {
+    try {
+      const stats = await databaseService.getDashboardStats()
+      this.fastify.log.info({ msg: `📊 Dashboard stats retrieved successfully` })
+      
+      return stats
+    } catch (error: any) {
+      this.fastify.log.error({ msg: `❌ Error getting dashboard stats: ${error.message}`, error })
+      throw error
+    }
+  }
 }

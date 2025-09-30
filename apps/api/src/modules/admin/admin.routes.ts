@@ -336,4 +336,47 @@ export default async function adminRoutes(fastify: FastifyInstance) {
       })
     }
   })
+
+  // Get dashboard statistics route
+  fastify.get('/stats', {
+    preHandler: [fastify.authenticate, requireAdmin()],
+    schema: {
+      tags: ['admins'],
+      summary: 'Get dashboard statistics',
+      description: 'Get counts for faculty, students, admins, colleges, and departments',
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            stats: {
+              type: 'object',
+              properties: {
+                facultyCount: { type: 'integer' },
+                studentCount: { type: 'integer' },
+                adminCount: { type: 'integer' },
+                collegeCount: { type: 'integer' },
+                departmentCount: { type: 'integer' }
+              }
+            }
+          }
+        },
+        500: errorResponseSchema
+      }
+    }
+  }, async (request, reply) => {
+    try {
+      const stats = await adminService.getDashboardStats()
+      
+      reply.send({
+        success: true,
+        stats
+      })
+    } catch (error: any) {
+      reply.status(500).send({
+        success: false,
+        error: error.message
+      })
+    }
+  })
 }

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Building2, Users, GraduationCap, BookOpen, TrendingUp } from "lucide-react";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
+import { useAuth } from "@/hooks/useAuth";
 
 // Mock data for admin's department - in real app, this would come from API
 const mockDepartment = {
@@ -18,17 +20,10 @@ const mockDepartment = {
   updatedAt: new Date(),
 };
 
-const mockStats = {
-  totalFaculty: 12,
-  totalStudents: 156,
-  totalCourses: 8,
-  activeAssignments: 24,
-  averageGrade: 85.2,
-  completionRate: 92.5,
-};
-
 export default function DashboardPage() {
   const [userType, setUserType] = useState<"student" | "faculty" | "admin">("student");
+  const { stats, loading, error } = useDashboardStats();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -44,6 +39,21 @@ export default function DashboardPage() {
 
   // Admin Dashboard - My Department
   if (userType === "admin") {
+    // Show loading or error state if not authenticated or not admin
+    if (!isAuthenticated || !user || user.role !== 'admin') {
+      return (
+        <div>
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-slate-900">My Department</h1>
+            <p className="text-slate-600">Overview of your department's performance and statistics</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg border border-slate-200">
+            <p className="text-slate-600">Please log in as an admin to view dashboard statistics.</p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div>
         <div className="mb-6">
@@ -65,13 +75,22 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-red-600">Error loading dashboard statistics: {error}</p>
+          </div>
+        )}
+
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg border border-slate-200">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-medium text-slate-500 mb-2">Faculty</h3>
-                <p className="text-2xl font-bold text-slate-900">{mockStats.totalFaculty}</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {loading ? "..." : error ? "Error" : stats?.facultyCount || 0}
+                </p>
               </div>
               <Users className="w-8 h-8 text-blue-600" />
             </div>
@@ -81,7 +100,9 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-medium text-slate-500 mb-2">Students</h3>
-                <p className="text-2xl font-bold text-slate-900">{mockStats.totalStudents}</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {loading ? "..." : error ? "Error" : stats?.studentCount || 0}
+                </p>
               </div>
               <GraduationCap className="w-8 h-8 text-green-600" />
             </div>
@@ -90,8 +111,10 @@ export default function DashboardPage() {
           <div className="bg-white p-6 rounded-lg border border-slate-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-2">Courses</h3>
-                <p className="text-2xl font-bold text-slate-900">{mockStats.totalCourses}</p>
+                <h3 className="text-sm font-medium text-slate-500 mb-2">Colleges</h3>
+                <p className="text-2xl font-bold text-slate-900">
+                  {loading ? "..." : error ? "Error" : stats?.collegeCount || 0}
+                </p>
               </div>
               <BookOpen className="w-8 h-8 text-purple-600" />
             </div>
@@ -100,8 +123,10 @@ export default function DashboardPage() {
           <div className="bg-white p-6 rounded-lg border border-slate-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-2">Active Assignments</h3>
-                <p className="text-2xl font-bold text-slate-900">{mockStats.activeAssignments}</p>
+                <h3 className="text-sm font-medium text-slate-500 mb-2">Departments</h3>
+                <p className="text-2xl font-bold text-slate-900">
+                  {loading ? "..." : error ? "Error" : stats?.departmentCount || 0}
+                </p>
               </div>
               <TrendingUp className="w-8 h-8 text-orange-600" />
             </div>
@@ -111,15 +136,19 @@ export default function DashboardPage() {
         {/* Performance Metrics */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg border border-slate-200">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Academic Performance</h3>
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">System Overview</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-slate-600">Average Grade</span>
-                <span className="text-2xl font-bold text-slate-900">{mockStats.averageGrade}%</span>
+                <span className="text-slate-600">Total Admins</span>
+                <span className="text-2xl font-bold text-slate-900">
+                  {loading ? "..." : error ? "Error" : stats?.adminCount || 0}
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-slate-600">Completion Rate</span>
-                <span className="text-2xl font-bold text-slate-900">{mockStats.completionRate}%</span>
+                <span className="text-slate-600">Total Users</span>
+                <span className="text-2xl font-bold text-slate-900">
+                  {loading ? "..." : error ? "Error" : ((stats?.facultyCount || 0) + (stats?.studentCount || 0) + (stats?.adminCount || 0))}
+                </span>
               </div>
             </div>
           </div>
@@ -129,15 +158,15 @@ export default function DashboardPage() {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-slate-600">5 new assignments created this week</span>
+                <span className="text-sm text-slate-600">System statistics updated</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm text-slate-600">12 students enrolled in new courses</span>
+                <span className="text-sm text-slate-600">Dashboard data refreshed</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                <span className="text-sm text-slate-600">3 faculty members joined the department</span>
+                <span className="text-sm text-slate-600">Real-time data connected</span>
               </div>
             </div>
           </div>

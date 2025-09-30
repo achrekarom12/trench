@@ -960,6 +960,46 @@ export class DatabaseService {
     })
   }
 
+  // Get counts for dashboard statistics
+  async getFacultyCount(): Promise<number> {
+    return this.prisma.faculty.count()
+  }
+
+  async getStudentCount(): Promise<number> {
+    return this.prisma.student.count()
+  }
+
+  async getAdminCount(): Promise<number> {
+    return this.prisma.admin.count()
+  }
+
+  async getCollegeCount(): Promise<number> {
+    return this.prisma.college.count()
+  }
+
+  async getDepartmentCount(): Promise<number> {
+    return this.prisma.department.count()
+  }
+
+  // Get dashboard statistics
+  async getDashboardStats() {
+    const [facultyCount, studentCount, adminCount, collegeCount, departmentCount] = await Promise.all([
+      this.getFacultyCount(),
+      this.getStudentCount(),
+      this.getAdminCount(),
+      this.getCollegeCount(),
+      this.getDepartmentCount()
+    ])
+
+    return {
+      facultyCount,
+      studentCount,
+      adminCount,
+      collegeCount,
+      departmentCount
+    }
+  }
+
   // Cleanup
   async disconnect() {
     await this.prisma.$disconnect()

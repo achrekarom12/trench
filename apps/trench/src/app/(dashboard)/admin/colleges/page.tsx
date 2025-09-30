@@ -94,11 +94,11 @@ export default function CollegesPage() {
         </div>
         <div className="bg-white p-6 rounded-lg border border-slate-200">
           <h3 className="text-sm font-medium text-slate-500 mb-2">Total Departments</h3>
-          <p className="text-2xl font-bold text-slate-900">0</p>
+          <p className="text-2xl font-bold text-slate-900">-</p>
         </div>
         <div className="bg-white p-6 rounded-lg border border-slate-200">
           <h3 className="text-sm font-medium text-slate-500 mb-2">Total Users</h3>
-          <p className="text-2xl font-bold text-slate-900">0</p>
+          <p className="text-2xl font-bold text-slate-900">-</p>
         </div>
       </div>
 

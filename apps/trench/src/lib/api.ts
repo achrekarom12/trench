@@ -7,7 +7,7 @@ class ApiClient {
     this.baseURL = baseURL;
   }
 
-  private async request<T>(
+  async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
@@ -85,6 +85,11 @@ class ApiClient {
       method: "POST",
       body: JSON.stringify(submission),
     });
+  }
+
+  // Admin endpoints
+  async getDashboardStats() {
+    return this.request("/api/v1/admins/stats");
   }
 }
 
