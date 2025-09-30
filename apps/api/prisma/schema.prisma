@@ -206,6 +206,46 @@ model Notification {
   @@map("notifications")
 }
 
+// College Model
+model College {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  address   String?
+  phone     String?
+  email     String?
+  website   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  departments Department[]
+
+  // Indexes
+  @@index([name])
+  @@map("colleges")
+}
+
+// Department Model
+model Department {
+  id        String   @id @default(cuid())
+  name      String
+  collegeId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  college College @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  admins   Admin[]
+  faculty  Faculty[]
+  students Student[]
+
+  // Indexes
+  @@index([collegeId])
+  @@index([name])
+  @@unique([name, collegeId])
+  @@map("departments")
+}
+
 // System Settings Model
 model SystemSetting {
   id        String   @id @default(cuid())
@@ -226,7 +266,7 @@ model SystemSetting {
 model Student {
   id           String  @id
   rollNumber    String  @unique @map("roll_number")
-  department    String
+  departmentId  String
   year          Int
   division      String?
   academicYear  String? @map("academic_year")
@@ -235,11 +275,12 @@ model Student {
   updatedAt     DateTime @updatedAt
 
   // Relations
-  user User @relation(fields: [id], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [id], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
   // Indexes
   @@index([rollNumber])
-  @@index([department])
+  @@index([departmentId])
   @@index([year])
   @@index([prn])
   @@map("students")
@@ -249,33 +290,36 @@ model Student {
 model Faculty {
   id             String  @id
   employeeId     String  @unique @map("employee_id")
-  department     String
+  departmentId   String
   designation    String?
   specialization String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   // Relations
-  user User @relation(fields: [id], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [id], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
   // Indexes
   @@index([employeeId])
-  @@index([department])
+  @@index([departmentId])
   @@index([designation])
   @@map("faculty")
 }
 
 // Admin Model
 model Admin {
-  id         String   @id
-  department String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id           String   @id
+  departmentId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Relations
-  user User @relation(fields: [id], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [id], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
   // Indexes
-  @@index([department])
+  @@index([departmentId])
+  @@unique([departmentId]) // Only one admin per department
   @@map("admins")
 }
