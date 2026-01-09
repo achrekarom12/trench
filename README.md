@@ -15,6 +15,5 @@ Jira for academia.
 
 2. Start the development environment:
    ```bash
-   docker-compose up -d
    npm run dev
    ```
