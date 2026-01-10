@@ -1,11 +1,14 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { User } from './entities/user.entity';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -88,6 +91,52 @@ export class AuthService {
             email: user.email,
             name: user.name,
             createdAt: user.createdAt,
+        };
+    }
+
+    async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+        const { email } = forgotPasswordDto;
+        const user = await this.userRepository.findOne({ where: { email } });
+
+        // For security reasons, don't reveal if user exists or not
+        if (user) {
+            const token = crypto.randomBytes(32).toString('hex');
+            user.resetToken = token;
+            user.resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour expiry
+            await this.userRepository.save(user);
+
+            // TODO: Actually send email
+            console.log(`[DUMMY EMAIL] Password reset token for ${email}: ${token}`);
+        }
+
+        return {
+            message: 'If an account with that email exists, a password reset link has been sent.',
+        };
+    }
+
+    async resetPassword(resetPasswordDto: ResetPasswordDto) {
+        const { token, newPassword } = resetPasswordDto;
+
+        const user = await this.userRepository.findOne({
+            where: {
+                resetToken: token,
+            },
+        });
+
+        if (!user || !user.resetTokenExpiry || user.resetTokenExpiry < new Date()) {
+            throw new BadRequestException('Invalid or expired reset token');
+        }
+
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        user.resetToken = null;
+        user.resetTokenExpiry = null;
+
+        await this.userRepository.save(user);
+
+        return {
+            message: 'Password successfully reset.',
         };
     }
 
